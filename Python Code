@@ -1,0 +1,43 @@
+import cv2
+import imutils
+import numpy as np
+import matplotlib.pyplot as plt
+while True: #as a void loop
+    for q in range(10):
+        t = 0
+        camera = cv2.VideoCapture(0) #Capture from a camera
+        while True: #this while loop for save cameraCap in var and png image
+            _,image=camera.read() #read func for read the camera and save what camera read in var
+            image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY) #from BGR2GRAY
+            #cv2.imshow('Text detection',image) #a window for show image
+            if cv2.waitKey(500):
+                cv2.imwrite('test1.jpg',image)
+                break
+        camera.release()
+        #plt.imshow(cv2.cvtColor(image,cv2.COLOR_BGR2RGB)) #like a test point
+        #plt.show()
+        bfilter = cv2.bilateralFilter(image,11,17,17) #bfilter for noise
+        edged = cv2.Canny(bfilter,30,200) #canny func (Edge Detection)
+        #plt.imshow(cv2.cvtColor(edged,cv2.COLOR_BGR2RGB))
+        #plt.show()
+        keypoints = cv2.findContours(edged.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE) #find contours in image and extract values
+        contourss = imutils.grab_contours(keypoints) #direct access to contours values
+        contours = sorted(contourss,key=cv2.contourArea,reverse=True)[:10] #top 10 (a big area)
+        try:
+            for contour in contours:#check contours
+                approx = cv2.approxPolyDP(contour,10,True)#"approx" Specify a specific area
+                if len(approx) == 4:#because "immune" in four contours
+                    location = approx
+                    break
+            mask = np.zeros(image.shape, np.uint8)#make blank window by zeros , size of the window = image variable
+            new_image = cv2.drawContours(mask,[location],-1,255,-1)#take values of the location and make mask except "immune" rectangle
+            new_image = cv2.bitwise_and(image, image, mask=mask)
+            #plt.imshow(cv2.cvtColor(new_image,cv2.COLOR_BGR2RGB))
+            #plt.show()
+            (x,y) = np.where(mask == 255)
+            (x1, y1) = (np.min(x), np.min(y))
+            (x2, y2) = (np.max(x), np.max(y))
+            cropped_image = image[x1:x2+1,y1:y2+1]
+            cv2.imwrite('test1.jpg',cropped_image)
+            #plt.imshow(cv2.cvtColor(cropped_image,cv2.COLOR_BGR2RGB))
+            #plt.show()
