@@ -1,14 +1,11 @@
 import cv2
 while True: #as a void loop
-    for q in range(10):
-        t = 0
-        camera = cv2.VideoCapture(0) #Capture 
-        while True: 
-            _,image=camera.read() #read the camera and save what the camera read in var
-            image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY) 
-            #cv2.imshow('Text detection',image) #a window for show the image
-            if cv2.waitKey(1000):
-                cv2.imwrite('test1.jpg',image)
-                break
-        camera.release()
-
+    camera = cv2.VideoCapture(0) #Capture from a camera
+    while True: #this while loop for save cameraCap in var and png image
+        _,image=camera.read() #read func for read the camera and save what camera read in var
+        image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY) #from BGR2GRAY
+        cv2.imshow('Text detection',image) #a window for show image
+        if cv2.waitKey(1000):
+            cv2.imwrite('test1.jpg',image)
+            break
+    camera.release()
